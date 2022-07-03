@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DNITests": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
