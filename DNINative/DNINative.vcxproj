@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\DNI\converters.h" />
     <ClInclude Include="include\DNI\DNI.h" />
   </ItemGroup>
   <ItemGroup>

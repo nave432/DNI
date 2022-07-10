@@ -1,41 +1,75 @@
 #pragma once
 
-
+#include <map>
 
 namespace DNI
 {
 
 	namespace Types
 	{
-		using DNIString = void*;
-
-		struct DNIArray{};
-		struct DNIIntArray : public DNIArray{};
+		struct _DNIObject {}; using DNIObject = _DNIObject*;
+		struct _DNIObjectArray : public _DNIObject {}; using DNIObjectArray = _DNIObjectArray*;
+		struct _DNIString : public _DNIObject {};  using DNIString	 = _DNIString*;
+		struct _DNIArray : public _DNIObject {};   using DNIArray	 = _DNIArray*;
+		struct _DNIIntArray : public _DNIArray {}; using DNIIntArray = _DNIIntArray*;
 	}
 
-	using PtrCreateManagedStringFromCharPtr = void* (*)(void* ptr, int len);
-	using PtrGetArraySizePtr				= int(*) (Types::DNIArray* ptr);
-	using PtrGetIntArrayElements			= int(*)(Types::DNIIntArray* managedArrayObject, int* destNativeArrayPtr, int startIndex, int length);
-	using PtrSetIntArrayElementsPtr			= int(*)(Types::DNIIntArray* managedArrayObject, int* srcNativeArrayPtr, int startIndex, int length);
-	using PtrNewIntArrayPtr					= Types::DNIIntArray*(*)(int size);
+	using PtrGetBoolFromObjectPtr			= bool(*)(const Types::DNIObject ptr);
+	using PtrGetIntFromObjectPtr			= int(*)(const Types::DNIObject ptr);
+	using PtrGetDoubleFromObjectPtr			= double(*)(const Types::DNIObject ptr);
+
+	using PtrBoolToObject					= Types::DNIObject (*) (bool boolVal);
+	using PtrIntToObject					= Types::DNIObject (*) (int intVal);
+	using PtrDoubleToObject					= Types::DNIObject (*) (double dbl);
+
+
+	using PtrGetArraySizePtr				= int(*) (const Types::DNIArray ptr);
+	using PtrGetIntArrayElements			= int(*)(const Types::DNIIntArray managedArrayObject, int* destNativeArrayPtr, const int startIndex, const int length);
+	using PtrSetIntArrayElementsPtr			= int(*)(Types::DNIIntArray managedArrayObject, const int* srcNativeArrayPtr, const int startIndex, const int length);
+	using PtrNewIntArrayPtr					= Types::DNIIntArray(*)(const int size);
+	
+	
+	// reflection
+	using PtrGetMethodPtr					= Types::DNIObject (*)(const Types::DNIObject managedObject, const Types::DNIString methodName, const Types::DNIString signature);
+	using PtrInvokeMethodPtr				= Types::DNIObject (*)(const Types::DNIObject managedObject, const Types::DNIObject methodPtr,  const Types::DNIObject parameters);
+	using PtrGetPropertyPtr					= Types::DNIObject (*)(const Types::DNIObject managedObject, const Types::DNIString propertName);
+	using PtrGetGenericType					= Types::DNIObject (*)(const Types::DNIString typeName,		 const Types::DNIString parameters);
+	using PtrCreateInstance					= Types::DNIObject (*)(const Types::DNIObject type, Types::DNIObjectArray parameters);
+	
+	// string function
+	using PtrCreateManagedStringFromCharPtr = Types::DNIString (*)(const void* ptr, const int len);
+	using PtrGetStringLength				= int(*)(Types::DNIObject stringPtr);
+	using PtrStringToANSIStringPtr			= char*(*)(Types::DNIObject stringPtr);
+	using PtrFreeCoTaskMemPtr				= void(*)(char* nativeCharPtr);
+
 	struct DNI
 	{
-		PtrCreateManagedStringFromCharPtr CreateManagedStringFromCharPtr;
-		PtrGetArraySizePtr                GetArraySizePtr;
-		PtrGetIntArrayElements			  GetIntArrayElementsPtr;
-		PtrSetIntArrayElementsPtr		  SetIntArrayElementsPtr;
-		PtrNewIntArrayPtr				  NewIntArrayPtr;
+		
+		PtrGetBoolFromObjectPtr			  GetBoolFromObject;
+		PtrGetIntFromObjectPtr			  GetIntFromObject;
+		PtrGetDoubleFromObjectPtr		  GetDoubleFromObject;
+
+		PtrBoolToObject					  BoolToObject;
+		PtrIntToObject					  IntToObject;
+		PtrDoubleToObject				  DoubleToObject;
+
+		PtrGetArraySizePtr                GetArraySize;
+		PtrGetIntArrayElements			  GetIntArrayElements;
+		PtrSetIntArrayElementsPtr		  SetIntArrayElements;
+		PtrNewIntArrayPtr				  NewIntArray;
+		
+		// reflection function
+		PtrGetMethodPtr					  GetMethod;
+		PtrInvokeMethodPtr				  InvokeMethod;
+		PtrGetPropertyPtr				  GetProperty;
+		PtrGetGenericType				  GetGenericType;
+		PtrCreateInstance				  CreateInstance;
+
+		// string function
+		PtrCreateManagedStringFromCharPtr CreateManagedStringFromChar;
+		PtrGetStringLength				  GetStringLength;
+		PtrStringToANSIStringPtr		  StringToANSIString;
+		PtrFreeCoTaskMemPtr				  FreeCoTaskMem;
 	};
 
-	template<class Dest, class Src>
-	Dest convert(DNI* pDni, Src* src)
-	{
-		
-	}
-
-	Types::DNIString convert(DNI* pDni, char* src)
-	{
-		size_t len = strlen(src);
-		return pDni->CreateManagedStringFromCharPtr(src, (int)len);
-	}
 }

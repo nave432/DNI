@@ -1,6 +1,7 @@
 using DNI;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -27,10 +28,16 @@ namespace DNITests
             [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(DNI.Marshaler.ManagedToNativeMarshaler))]
             int[] c);
 
-
         [DllImport("Cpp_Dll.dll", CharSet = CharSet.Ansi)]
         [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(DNI.Marshaler.NativeToManagedMarshaler))]
         public static extern string stringFunction(DNI.DNI pDni, string str);
+
+
+        [DllImport("Cpp_Dll.dll")]
+        [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(DNI.Marshaler.NativeToManagedMarshaler))]
+        public static extern Dictionary<string,string> functionTakingDictionary(DNI.DNI pDni,
+            [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(DNI.Marshaler.ManagedToNativeMarshaler))]
+            Dictionary<string,int> input);
 
 
         [TestMethod]
@@ -69,6 +76,31 @@ namespace DNITests
                 {
                     Assert.AreEqual(inputArray[i], retArray[i]);
                 }
+            }
+
+        }
+
+        [TestMethod]
+        public void TestPassingDictionary()
+        {
+            using (DNIHelper dNIHelper = new DNIHelper())
+            {
+                Dictionary<string, int> dict = new Dictionary<string, int>()
+                {
+                    { "person1", 1},
+                    { "person2", 2},
+                    { "person3", 3},
+                    { "person4", 4}
+                };
+                var itr = dict.GetEnumerator();
+                //while( itr.MoveNext())
+                //{
+                //    itr.Current;
+                //}
+                Type t1 = dict.GetType();
+                Type? type = Type.GetType("System.String");
+                var ret = functionTakingDictionary(dNIHelper.DNIInstance, dict);
+                
             }
 
         }
