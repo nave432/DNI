@@ -45,7 +45,7 @@ extern "C"
 
 	_declspec(dllexport) DNI::Types::DNIObject functionTakingDictionary(DNI::DNI* pDni, DNI::Types::DNIObject input)
 	{
-		std::map<std::string, int> mapRet = DNI::convertTo<std::map<std::string, int> >(pDni, input);
+		const std::map<std::string, int>& mapRet = DNI::convertTo<std::map<std::string, int> >(pDni, input);
 		std::map<std::string, std::string> output;
 		for (auto item : mapRet)
 		{

@@ -22,14 +22,17 @@ namespace DNI
 	using PtrIntToObject					= Types::DNIObject (*) (int intVal);
 	using PtrDoubleToObject					= Types::DNIObject (*) (double dbl);
 
-
+	// array functions
+	using PtrNewObjectArray					= Types::DNIObjectArray(*)(Types::DNIString strObjectTypeName, int size);
 	using PtrGetArraySizePtr				= int(*) (const Types::DNIArray ptr);
+	using PtrSetArrayElementsPtr			= int(*)(Types::DNIObjectArray managedArrayObject, Types::DNIObject* srcNativeArrayPtr, const int startIndex, const int length);
 	using PtrGetIntArrayElements			= int(*)(const Types::DNIIntArray managedArrayObject, int* destNativeArrayPtr, const int startIndex, const int length);
 	using PtrSetIntArrayElementsPtr			= int(*)(Types::DNIIntArray managedArrayObject, const int* srcNativeArrayPtr, const int startIndex, const int length);
 	using PtrNewIntArrayPtr					= Types::DNIIntArray(*)(const int size);
 	
 	
 	// reflection
+	using PtrNewObjectArray					= Types::DNIObjectArray (*)(const Types::DNIString strObjectTypeName, const int size);
 	using PtrGetMethodPtr					= Types::DNIObject (*)(const Types::DNIObject managedObject, const Types::DNIString methodName, const Types::DNIString signature);
 	using PtrInvokeMethodPtr				= Types::DNIObject (*)(const Types::DNIObject managedObject, const Types::DNIObject methodPtr,  const Types::DNIObject parameters);
 	using PtrGetPropertyPtr					= Types::DNIObject (*)(const Types::DNIObject managedObject, const Types::DNIString propertName);
@@ -53,7 +56,9 @@ namespace DNI
 		PtrIntToObject					  IntToObject;
 		PtrDoubleToObject				  DoubleToObject;
 
+		PtrNewObjectArray				  NewObjectArray;
 		PtrGetArraySizePtr                GetArraySize;
+		PtrSetArrayElementsPtr			  SetArrayElementsPtr;
 		PtrGetIntArrayElements			  GetIntArrayElements;
 		PtrSetIntArrayElementsPtr		  SetIntArrayElements;
 		PtrNewIntArrayPtr				  NewIntArray;

@@ -54,12 +54,15 @@ namespace DNI
 		Types::DNIString addMethodName = convertTo<Types::DNIString>(pDni, "Add");
 		Types::DNIObject addMethod = pDni->GetMethod(dicObject, addMethodName, strGenericParameters);
 		
-		
+		Types::DNIString objectNamestr = convertTo<Types::DNIString>(pDni, "System.Object");
+		Types::DNIObjectArray objArray = pDni->NewObjectArray(objectNamestr, 2);
 		for (const auto& item : in)
 		{
 			Types::DNIObject key = convertTo<Types::DNIObject>(pDni, item.first);
 			Types::DNIObject val = convertTo<Types::DNIObject>(pDni, item.second);
-			//pDni->InvokeMethod(dicObject, addMethod)
+			Types::DNIObject params[]{ key, val };
+			pDni->SetArrayElementsPtr(objArray, params,0,2);
+			pDni->InvokeMethod(dicObject, addMethod, objArray);
 		}
 		out = dicObject;
 		return true;

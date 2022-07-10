@@ -16,6 +16,8 @@ namespace DNI.Marshaler
 
         public IntPtr MarshalManagedToNative(object ManagedObj)
         {
+            if(ManagedObj == null)
+                return IntPtr.Zero;
             _handle = GCHandle.Alloc(ManagedObj);
             return GCHandle.ToIntPtr(_handle);
         }

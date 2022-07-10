@@ -92,15 +92,13 @@ namespace DNITests
                     { "person3", 3},
                     { "person4", 4}
                 };
-                var itr = dict.GetEnumerator();
-                //while( itr.MoveNext())
-                //{
-                //    itr.Current;
-                //}
-                Type t1 = dict.GetType();
-                Type? type = Type.GetType("System.String");
+
                 var ret = functionTakingDictionary(dNIHelper.DNIInstance, dict);
-                
+                //foreach(var item in ret)
+                //{
+                //    Assert.IsTrue(dict.TryGetValue(item.Key, out int value));
+                //    Assert.AreEqual(value.ToString(), item.Value);
+                //}
             }
 
         }

@@ -11,17 +11,24 @@ namespace DNI
     public delegate IntPtr PtrIntToObject(int intVal);
     public delegate IntPtr PtrDoubleToObject(double dbl);
 
-    public delegate int    PtrGetArraySize(IntPtr ptr);
+
+    #region Array function
+    public delegate IntPtr  PtrNewObjectArray(IntPtr strObjectTypeName, int size);
+    public delegate int     PtrGetArraySize(IntPtr ptr);
+    public delegate int     PtrSetArrayElements(IntPtr managedArrayObject, IntPtr srcNativeArrayPtr, int startIndex, int size);
     
     public delegate int     PtrGetIntArrayElements(IntPtr managedArrayObject, IntPtr destNativeArrayPtr, int startIndex, int size);
     public delegate int     PtrSetIntArrayElements(IntPtr managedArrayObject, IntPtr srcNativeArrayPtr,  int startIndex, int size);
     public delegate IntPtr  PtrNewIntArray(int size);
+    #endregion
+
+    #region reflections
     public delegate IntPtr  PtrGetMethod(IntPtr managedObject,    IntPtr methodName, IntPtr signature);
     public delegate IntPtr  PtrInvokeMethod(IntPtr managedObject, IntPtr methodPtr,  IntPtr parameters);
     public delegate IntPtr  PtrGetProperty(IntPtr managedObject,  IntPtr propertyName);
     public delegate IntPtr  PtrGetGenericType(IntPtr typeName, IntPtr parameters);
     public delegate IntPtr  PtrCreateInstance(IntPtr type, IntPtr parameters);
-
+    #endregion
 
     #region string function
     public delegate IntPtr  PtrCreateManagedStringFromChar(IntPtr ptr, int len);
@@ -42,9 +49,11 @@ namespace DNI
         public PtrIntToObject                IntToObject      = null;
         public PtrDoubleToObject             DoubleToObject   = null;
 
-
+        // array fuctions
+        public PtrNewObjectArray             NewObjectArray = null;
         public PtrGetArraySize               GetArraySize = null;
-        // int functions (TODO add all other native types)
+        public PtrSetArrayElements           SetArrayElements = null;
+        // 1. int functions (TODO add all other native types)
         public PtrGetIntArrayElements        GetIntArrayElements = null;
         public PtrSetIntArrayElements        SetIntArrayElements = null;
         public PtrNewIntArray                NewIntArray = null;
@@ -79,7 +88,10 @@ namespace DNI
             DNIInstance.IntToObject                  = IntToObjectImpl;
             DNIInstance.DoubleToObject               = DoubleToObjectImpl;
 
+            // array functions
+            DNIInstance.NewObjectArray               = NewObjectArrayImpl;
             DNIInstance.GetArraySize                 = GetArraySizeImpl;
+            DNIInstance.SetArrayElements             = SetArrayElementsImpl;
             DNIInstance.GetIntArrayElements          = GetIntArrayElementsImpl;
             DNIInstance.SetIntArrayElements          = SetIntArrayElementsImpl;
             DNIInstance.NewIntArray                  = NewIntArrayImpl;
@@ -131,6 +143,15 @@ namespace DNI
             return (double)temp;
         }
 
+        #region array functions
+        IntPtr NewObjectArrayImpl(IntPtr strObjectTypeName, int size)
+        {
+            string ObjectTypeName = StringFrom(strObjectTypeName);
+            Type t = Type.GetType(ObjectTypeName);
+            var arr = Array.CreateInstance(t, size);
+            return IntPtrFromObject(arr);
+        }
+
         public int GetArraySizeImpl(IntPtr ptr)
         {
             GCHandle handle = GCHandle.FromIntPtr(ptr);
@@ -141,6 +162,28 @@ namespace DNI
                 return -1;
             object ret = props.GetValue(obj);
             return (int)ret;
+        }
+
+        int SetArrayElementsImpl(IntPtr managedArrayObject, IntPtr srcNativeArrayPtr, int startIndex, int length)
+        {
+            IntPtr[] destination = new IntPtr[length];
+            Marshal.Copy(srcNativeArrayPtr, destination, startIndex, length);
+            List<object> objList = new List<object>();
+            foreach (IntPtr ptr in destination)
+            {
+                objList.Add(GetObjectFromIntPtr<object>(ptr));
+            }
+
+            object[] arr = GetObjectFromIntPtr<object[]>(managedArrayObject);
+            if (arr == null || startIndex >= arr.Length)
+                return -1;
+            int remaining = arr.Length - startIndex;
+            int sizeToCopy = Math.Min(remaining, length);
+            for ( int i = startIndex; i < sizeToCopy; i++ )
+            {
+                arr[i] = objList[i];
+            }            
+            return sizeToCopy;
         }
 
 
@@ -175,11 +218,10 @@ namespace DNI
         IntPtr NewIntArrayImpl(int size)
         {
             int[] arr = new int[size];
-            GCHandle handle = GCHandle.Alloc(arr);
-            gCHandles.Add(handle);
-            return GCHandle.ToIntPtr(handle);
+            return IntPtrFromObject(arr);
         }
 
+        #endregion
 
         #region Reflection functions
 
@@ -231,10 +273,13 @@ namespace DNI
         IntPtr GetGenericTypeImpl(IntPtr typeName, IntPtr parameters)
         {
             string strType = StringFrom(typeName);
-            string signature = StringFrom(parameters);
-            // generic List with no parameters
             Type openType = Type.GetType(strType);
 
+            if (parameters == IntPtr.Zero)
+            {
+                return IntPtrFromObject(openType);
+            }
+            string signature = StringFrom(parameters);
             // To create a List<string>
             List<Type> tArgs = ParseTypes(signature);
             if (tArgs == null)
@@ -317,12 +362,20 @@ namespace DNI
             return GCHandle.ToIntPtr(handle);
         }
 
-        private string StringFrom(IntPtr methodNamePtr)
+        private string StringFrom(IntPtr strPtr)
         {
-            if (methodNamePtr == IntPtr.Zero)
+            if (strPtr == IntPtr.Zero)
                 return string.Empty;
-            GCHandle handle = GCHandle.FromIntPtr(methodNamePtr);
+            GCHandle handle = GCHandle.FromIntPtr(strPtr);
             return handle.Target as string;
+        }
+
+        private T GetObjectFromIntPtr<T>(IntPtr objPtr) where T : class
+        {
+            if (objPtr == IntPtr.Zero)
+                return default(T);
+            GCHandle handle = GCHandle.FromIntPtr(objPtr);
+            return handle.Target as T;
         }
 
         public void Dispose()

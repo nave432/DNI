@@ -6,7 +6,7 @@
 
     <IsPackable>false</IsPackable>
 
-    <BaseOutputPath>../bin</BaseOutputPath>
+    <BaseOutputPath>../../bin</BaseOutputPath>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>
