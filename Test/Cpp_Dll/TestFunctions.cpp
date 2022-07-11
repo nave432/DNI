@@ -25,14 +25,13 @@ extern "C"
 		return c;
 	}
 
-	_declspec(dllexport) DNI::Types::DNIArray intArrayFunction(DNI::DNI* pDni, DNI::Types::DNIIntArray pArray)
+	_declspec(dllexport) DNI::Types::DNIIntArray intArrayFunction(DNI::DNI* pDni, DNI::Types::DNIIntArray pArray)
 	{
-		unsigned int length = pDni->GetArraySize(pArray);
-		int* nativeIntArray = new int[length];
-		int copied = pDni->GetIntArrayElements(pArray, nativeIntArray, 0, length);
-		DNI::Types::DNIIntArray pArrayOut = pDni->NewIntArray(length);
-		pDni->SetIntArrayElements(pArrayOut, nativeIntArray, 0, length);
-		return pArrayOut;
+		// converting DNIIntArray to vector
+		const std::vector<int> arrayItems = DNI::convertTo<std::vector<int> >(pDni, pArray);
+
+		//converting vector to DNIIntArray
+		return DNI::convertTo<DNI::Types::DNIIntArray>(pDni, arrayItems);
 	}
 
 

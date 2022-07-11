@@ -21,5 +21,8 @@
     <ClInclude Include="include\DNI\converters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\DNI\NativeToDotnetType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

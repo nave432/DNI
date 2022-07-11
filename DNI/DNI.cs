@@ -154,14 +154,15 @@ namespace DNI
 
         public int GetArraySizeImpl(IntPtr ptr)
         {
-            GCHandle handle = GCHandle.FromIntPtr(ptr);
-            object obj = handle.Target;
-            Type t = obj.GetType();
-            PropertyInfo props = t.GetProperty("Length");
-            if (props == null)
-                return -1;
-            object ret = props.GetValue(obj);
-            return (int)ret;
+            Array arr = GetObjectFromIntPtr<Array>(ptr);
+            return (int)arr.Length;
+            //Type t = obj.GetType();
+
+            //PropertyInfo props = t.GetProperty("Length");
+            //if (props == null)
+            //    return -1;
+            //object ret = props.GetValue(obj);
+            //return (uint)ret;
         }
 
         int SetArrayElementsImpl(IntPtr managedArrayObject, IntPtr srcNativeArrayPtr, int startIndex, int length)

@@ -1,9 +1,11 @@
 #pragma once
 
 #include "DNI.h"
+#include "NativeToDotnetType.h"
 #include <map>
 #include <string>
-//#include <WTypes.h>
+#include <vector>
+
 
 namespace DNI
 {
@@ -16,6 +18,12 @@ namespace DNI
 	{
 		size_t len = strlen(input);
 		out = pDni->CreateManagedStringFromChar(input, (int)len);
+		return true;
+	}
+
+	bool convert(DNI* pDni, const std::string& input, Types::DNIString& out)
+	{
+		out = pDni->CreateManagedStringFromChar(input.c_str(), (int)input.length());
 		return true;
 	}
 
@@ -46,8 +54,12 @@ namespace DNI
 	template< typename T1, typename T2>
 	bool convert(DNI* pDni, const std::map<T1, T2>& in, Types::DNIObject& out)
 	{
-		Types::DNIString strTypeName = convertTo<Types::DNIString>(pDni, "System.Collections.Generic.Dictionary`2");
-		Types::DNIString strGenericParameters = convertTo<Types::DNIString>(pDni, "System.String,System.String");
+		const std::string& strMapType = GetTypeName(&in);
+		const std::string& strArg1Type = GetTypeName((T1*)(nullptr));
+		const std::string& strArg2Type = GetTypeName((T1*)(nullptr));
+		const std::string& args = strArg1Type + "," + strArg2Type;
+		const Types::DNIString strTypeName = convertTo<Types::DNIString>(pDni, strMapType);
+		Types::DNIString strGenericParameters = convertTo<Types::DNIString>(pDni, args);
 		Types::DNIObject dictType = pDni->GetGenericType(strTypeName, strGenericParameters);
 		Types::DNIObject dicObject = pDni->CreateInstance(dictType, nullptr);
 		
@@ -65,6 +77,14 @@ namespace DNI
 			pDni->InvokeMethod(dicObject, addMethod, objArray);
 		}
 		out = dicObject;
+		return true;
+	}
+
+	bool convert(DNI* pDni, const std::vector<int>& input, Types::DNIIntArray& out)
+	{
+		int length = (int)input.size();
+		out = pDni->NewIntArray(length);
+		pDni->SetIntArrayElements(out, &input[0], 0, length);
 		return true;
 	}
 
@@ -129,6 +149,16 @@ namespace DNI
 			out.insert(std::make_pair(key, value));
 		}
 		return true;
+	}
+
+	bool convert(DNI* pDni, Types::DNIIntArray input, std::vector<int>& out)
+	{
+		const int length = pDni->GetArraySize(input);
+		if (length <= 0)
+			return false;
+		out.resize(length);
+		const int copied = pDni->GetIntArrayElements(input, &out[0], 0, length);
+		return copied == length;
 	}
 
 	template<typename Ret, typename Input>

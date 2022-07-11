@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="include\DNI\converters.h" />
     <ClInclude Include="include\DNI\DNI.h" />
+    <ClInclude Include="include\DNI\NativeToDotnetType.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DNI\DNI.csproj">

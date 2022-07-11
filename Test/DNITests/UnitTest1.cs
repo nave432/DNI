@@ -94,11 +94,11 @@ namespace DNITests
                 };
 
                 var ret = functionTakingDictionary(dNIHelper.DNIInstance, dict);
-                //foreach(var item in ret)
-                //{
-                //    Assert.IsTrue(dict.TryGetValue(item.Key, out int value));
-                //    Assert.AreEqual(value.ToString(), item.Value);
-                //}
+                foreach (var item in ret)
+                {
+                    Assert.IsTrue(dict.TryGetValue(item.Key, out int value));
+                    Assert.AreEqual(value.ToString(), item.Value);
+                }
             }
 
         }
