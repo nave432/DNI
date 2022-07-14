@@ -14,45 +14,45 @@ namespace DNI
 	Ret convertTo(DNI* pDni, const Input& in);
 
 	// covert to managed objects
-	bool convert(DNI* pDni, const char* input, Types::DNIString& out)
+	static bool convert(DNI* pDni, const char* input, Types::DNIString& out)
 	{
 		size_t len = strlen(input);
 		out = pDni->CreateManagedStringFromChar(input, (int)len);
 		return true;
 	}
 
-	bool convert(DNI* pDni, const std::string& input, Types::DNIString& out)
+	static bool convert(DNI* pDni, const std::string& input, Types::DNIString& out)
 	{
 		out = pDni->CreateManagedStringFromChar(input.c_str(), (int)input.length());
 		return true;
 	}
 
-	bool convert(DNI* pDni, const int input, Types::DNIObject& out)
+	static bool convert(DNI* pDni, const int input, Types::DNIObject& out)
 	{
 		out = pDni->IntToObject(input);
 		return true;
 	}
 
-	bool convert(DNI* pDni, const bool input, Types::DNIObject& out)
+	static bool convert(DNI* pDni, const bool input, Types::DNIObject& out)
 	{
 		out = pDni->BoolToObject(input);
 		return true;
 	}
 
-	bool convert(DNI* pDni, const double input, Types::DNIObject& out)
+	static bool convert(DNI* pDni, const double input, Types::DNIObject& out)
 	{
 		out = pDni->DoubleToObject(input);
 		return true;
 	}
 
-	bool convert(DNI* pDni, const std::string& input, Types::DNIObject& out)
+	static bool convert(DNI* pDni, const std::string& input, Types::DNIObject& out)
 	{
 		out = pDni->CreateManagedStringFromChar(input.c_str(), (int)input.length());
 		return true;
 	}
 
 	template< typename T1, typename T2>
-	bool convert(DNI* pDni, const std::map<T1, T2>& in, Types::DNIObject& out)
+	static bool convert(DNI* pDni, const std::map<T1, T2>& in, Types::DNIObject& out)
 	{
 		const std::string& strMapType = GetTypeName(&in);
 		const std::string& strArg1Type = GetTypeName((T1*)(nullptr));
@@ -80,7 +80,7 @@ namespace DNI
 		return true;
 	}
 
-	bool convert(DNI* pDni, const std::vector<int>& input, Types::DNIIntArray& out)
+	static bool convert(DNI* pDni, const std::vector<int>& input, Types::DNIIntArray& out)
 	{
 		int length = (int)input.size();
 		out = pDni->NewIntArray(length);
@@ -89,13 +89,20 @@ namespace DNI
 	}
 
 	// covert to native types
-	bool convert(DNI* pDni, const Types::DNIObject in, bool& out)
+	static bool convert(DNI* pDni, const char* input, std::string& out)
+	{
+		size_t len = strlen(input);
+		out = std::move(std::string(input,len));
+		return true;
+	}
+
+	static bool convert(DNI* pDni, const Types::DNIObject in, bool& out)
 	{
 		out = pDni->GetBoolFromObject(in);
 		return true;
 	}
 
-	bool convert(DNI* pDni, const Types::DNIObject in, std::string& out)
+	static bool convert(DNI* pDni, const Types::DNIObject in, std::string& out)
 	{
 		char* pStr = pDni->StringToANSIString(in);
 		out = std::move(std::string(pStr));
@@ -103,20 +110,25 @@ namespace DNI
 		return true;
 	}
 
-	bool convert(DNI* pDni, const  Types::DNIObject in, int& out)
+	static bool convert(DNI* pDni, const Types::DNIString in, std::string& out)
+	{
+		return convert(pDni, (Types::DNIObject)in, out);
+	}
+
+	static bool convert(DNI* pDni, const  Types::DNIObject in, int& out)
 	{
 		out = pDni->GetIntFromObject(in);
 		return true;
 	}
 
-	bool convert(DNI* pDni, const  Types::DNIObject in, double& out)
+	static bool convert(DNI* pDni, const  Types::DNIObject in, double& out)
 	{
 		out = pDni->GetDoubleFromObject(in);
 		return true;
 	}
 
 	template< typename T1, typename T2>
-	bool convert(DNI* pDni, Types::DNIObject input, std::map<T1, T2>& out)
+	static bool convert(DNI* pDni, Types::DNIObject input, std::map<T1, T2>& out)
 	{
 		Types::DNIString strEmptyParams = convertTo<Types::DNIString>(pDni, "");
 		Types::DNIObject emptyParams = nullptr;
@@ -151,7 +163,7 @@ namespace DNI
 		return true;
 	}
 
-	bool convert(DNI* pDni, Types::DNIIntArray input, std::vector<int>& out)
+	static bool convert(DNI* pDni, Types::DNIIntArray input, std::vector<int>& out)
 	{
 		const int length = pDni->GetArraySize(input);
 		if (length <= 0)
@@ -161,8 +173,16 @@ namespace DNI
 		return copied == length;
 	}
 
+	//enum converter
+	template< typename T>
+	static bool convert(DNI* pDni, Types::DNIEnum input, T& out)
+	{
+		out = (T)input;
+		return true;
+	}
+
 	template<typename Ret, typename Input>
-	Ret convertTo(DNI* pDni, const Input& in)
+	static Ret convertTo(DNI* pDni, const Input& in)
 	{
 		Ret temp;
 		convert(pDni, in, temp);

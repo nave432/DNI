@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace DNI
@@ -156,13 +158,6 @@ namespace DNI
         {
             Array arr = GetObjectFromIntPtr<Array>(ptr);
             return (int)arr.Length;
-            //Type t = obj.GetType();
-
-            //PropertyInfo props = t.GetProperty("Length");
-            //if (props == null)
-            //    return -1;
-            //object ret = props.GetValue(obj);
-            //return (uint)ret;
         }
 
         int SetArrayElementsImpl(IntPtr managedArrayObject, IntPtr srcNativeArrayPtr, int startIndex, int length)
@@ -358,9 +353,9 @@ namespace DNI
         //private function
         private IntPtr IntPtrFromObject(object obj)
         {
-            GCHandle handle = GCHandle.Alloc(obj);
+            GCHandle handle = GCHandle.Alloc(obj, GCHandleType.Pinned);
             gCHandles.Add(handle);
-            return GCHandle.ToIntPtr(handle);
+            return handle.AddrOfPinnedObject();
         }
 
         private string StringFrom(IntPtr strPtr)

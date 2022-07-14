@@ -12,6 +12,9 @@ namespace DNI
 		struct _DNIString : public _DNIObject {};  using DNIString	 = _DNIString*;
 		struct _DNIArray : public _DNIObject {};   using DNIArray	 = _DNIArray*;
 		struct _DNIIntArray : public _DNIArray {}; using DNIIntArray = _DNIIntArray*;
+
+		using DNINativeObject = void*;
+		using DNIEnum = int;
 	}
 
 	using PtrGetBoolFromObjectPtr			= bool(*)(const Types::DNIObject ptr);

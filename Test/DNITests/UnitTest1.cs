@@ -1,4 +1,5 @@
 using DNI;
+using DNITests.ProxyClasses;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -101,6 +102,29 @@ namespace DNITests
                 }
             }
 
+        }
+
+        [TestMethod]
+        public void TestClassConstructionAndDestruction()
+        {
+            using (Zoo zoo = new Zoo())
+            {
+                Assert.AreNotEqual( zoo.ProxyHandle, IntPtr.Zero );
+                Assert.AreEqual(zoo.GetAnimalCount(), 0 );
+                Animal animal1 = zoo.CreateAnimal(AnimalTypes.Cat, "meow");
+                zoo.AddAnimal(animal1);
+                Assert.AreEqual(zoo.GetAnimalCount(), 1);
+
+                Animal animal2 = zoo.CreateAnimal(AnimalTypes.Dog, "bowbow");
+                zoo.AddAnimal(animal2);
+                Assert.AreEqual(zoo.GetAnimalCount(), 2);
+
+                zoo.RemoveAnimal("meow");
+                Assert.AreEqual(zoo.GetAnimalCount(), 1);
+
+                zoo.RemoveAnimal("bowbow");
+                Assert.AreEqual(zoo.GetAnimalCount(), 0);
+            }
         }
     }
 }
