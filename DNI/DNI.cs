@@ -353,9 +353,9 @@ namespace DNI
         //private function
         private IntPtr IntPtrFromObject(object obj)
         {
-            GCHandle handle = GCHandle.Alloc(obj, GCHandleType.Pinned);
+            GCHandle handle =  GCHandle.Alloc(obj);
             gCHandles.Add(handle);
-            return handle.AddrOfPinnedObject();
+            return GCHandle.ToIntPtr(handle);
         }
 
         private string StringFrom(IntPtr strPtr)
