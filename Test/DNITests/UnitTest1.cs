@@ -55,16 +55,16 @@ namespace DNITests
             Assert.AreEqual('x', charFunction('x'));
         }
 
-        [TestMethod]
-        public void callStringFunction()
-        {
-            using (DNIHelper dNIHelper = new DNIHelper())
-            {
-                string str = stringFunction(dNIHelper.DNIInstance, "abcd");
-                Assert.AreEqual(str, "abcd");
-            }
+        //[TestMethod]
+        //public void callStringFunction()
+        //{
+        //    using (DNIHelper dNIHelper = new DNIHelper())
+        //    {
+        //        string str = stringFunction(dNIHelper.DNIInstance, "abcd");
+        //        Assert.AreEqual(str, "abcd");
+        //    }
 
-        }
+        //}
 
         [TestMethod]
         public void callIntArrayFunction()

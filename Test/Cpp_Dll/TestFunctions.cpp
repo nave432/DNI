@@ -35,7 +35,7 @@ extern "C"
 	}
 
 
-	_declspec(dllexport) DNI::Types::DNIString stringFunction(DNI::DNI* pDni, char* string)
+	_declspec(dllexport) DNI::Types::DNIString stringFunction(DNI::DNI* pDni, const char* string)
 	{
 		std::cout << string << std::endl;
 		const std::string& str = DNI::convertTo<std::string>(pDni, string);
