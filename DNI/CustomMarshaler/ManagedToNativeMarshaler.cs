@@ -18,8 +18,8 @@ namespace DNI.Marshaler
         {
             if(ManagedObj == null)
                 return IntPtr.Zero;
-            _handle = GCHandle.Alloc(ManagedObj);
-            return GCHandle.ToIntPtr(_handle);
+            _handle = GCHandle.Alloc(ManagedObj, GCHandleType.Pinned);
+            return _handle.AddrOfPinnedObject();
         }
 
         public void CleanUpNativeData(IntPtr pNativeData)
