@@ -42,4 +42,4 @@ jobs:
       uses: Malcolmnixon/Setup-VSTest@v4
 
     - name: VSTest
-      run: vstest.console bin\Release\DNITests.dll
+      run: vstest.console bin\x64\Release\DNITests.dll
