@@ -5,7 +5,8 @@ A donet core to c++ header interoperability library
 The DNI library provides a DNI instance object which has few function pointers(delegates) to manipulate DotNet objects. The DNI object can be passed to C++ layer using which DotNet object can be converted to c++ and vice versa. The concept is similar to Java Native Interface.
 
 Examples
-##1. A simple example is passing an dotnet int array to c function as parameter and the C function returns a dotnet int array.
+## 1. Passing a amanged object to c/c++
+A simple example is passing an dotnet int array to c function as parameter and the C function returns a dotnet int array.
 
 C# side
 
@@ -54,7 +55,7 @@ The above example show raw code on manipulating dotnet object via DNI. There few
         return DNI::convertTo<DNI::Types::DNIIntArray>(pDni, arrayItems);
     }
 ```
-##2. Using C++ class in DotNet.
+## 2. Using C++ class in DotNet.
 In the example in test project, there is "Zoo" and "Animal" class in C++ and for those classes, there is corresponding proxy classes in dotnetside. The only member variable in the ProxyClass is a IntPtr which is a point to the actuall pointer to the class in C++.
 
 ### C# side
@@ -99,8 +100,8 @@ public:
 	int  GetAnimalCount();
 	bool AddAnimal(Animal* pAnimals);
 	bool RemoveAnimal(const std::string& name);
-    Animal* CreateAnimal(const AnimalTypes type, const std::string& name);
-    . . . . .
+        Animal* CreateAnimal(const AnimalTypes type, const std::string& name);
+       . . . . .
 }
 ```
 
